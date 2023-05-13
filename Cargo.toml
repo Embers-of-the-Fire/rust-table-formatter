@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Embers-of-the-fire <wangbh533@126.com>"]
 description = "A simple text table formatter written"
-license = "MIT or Apache-2.0"
+license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/Embers-of-the-Fire/rust-table-formatter.git"
 
