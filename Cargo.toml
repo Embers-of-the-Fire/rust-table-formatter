@@ -6,7 +6,11 @@ authors = ["Embers-of-the-fire <wangbh533@126.com>"]
 description = "A simple text table formatter written"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
+homepage = "https://github.com/Embers-of-the-Fire/rust-table-formatter"
 repository = "https://github.com/Embers-of-the-Fire/rust-table-formatter.git"
+categories = ["command-line-interface", "value-formatting"]
+keywords = ["text", "table", "formatter"]
+include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE-MIT", "LICENSE-APACHE"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
