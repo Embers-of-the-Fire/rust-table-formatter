@@ -7,43 +7,52 @@ This lib is used to format plain-text table.
 Code:
 
 ```rust
-let data = [
-    TableRow::Row(vec![
-        TableCell::new("A"),
-        TableCell::new("1").with_align(TableAlign::Right),
-    ]),
-    TableRow::Row(vec![
-        TableCell::new("B"),
-        TableCell::new("2").with_align(TableAlign::Right),
-    ]),
-    TableRow::Splitter,
-    TableRow::PlainText("letter-number mapping".into()),
+let mut cells: Vec<Vec<TableCell>> = vec![
+    vec![
+        TableCell::new(Cell::TextCell("Cell Row".into())).with_width(20),
+        TableCell::new(Cell::TextCell("Left".into())).with_position(CellPosition::Left).with_width(10),
+        TableCell::new(Cell::TextCell("Middle".into())).with_position(CellPosition::Middle).with_width(10),
+        TableCell::new(Cell::TextCell("Right".into())).with_position(CellPosition::Right).with_width(10),
+    ],
+    (0..4).map(|_| TableCell::new(Cell::Splitter)).collect_vec(),
 ];
-let header = [
-    TableCell::new("Letter"),
-    TableCell::new("Number").with_align(TableAlign::Right),
-];
-let table = Table::new(&header, &data).unwrap().with_align(30);
-let mut output = Vec::new();
-table.format(&mut output).unwrap();
-println!("{}", String::from_utf8(output).unwrap());
+cells.append(
+    &mut (0..=3_u8)
+        .into_iter()
+        .map(|r| {
+            vec![
+                TableCell::new(Cell::TextCell(format!("Cell Row: {}", r))),
+                TableCell::new(Cell::TextCell("Left".into())).with_position(CellPosition::Left),
+                TableCell::new(Cell::TextCell("Middle".into()))
+                    .with_position(CellPosition::Middle),
+                TableCell::new(Cell::TextCell("Right".into()))
+                    .with_position(CellPosition::Right),
+            ]
+        })
+        .collect_vec(),
+);
+let table = Table::from_cells(cells).with_header().with_footer();
+let render_res = table.render();
+println!("{}", render_res);
 ```
 
 Output:
 ```
-──────────────────────────────
-| Letter              Number |
-──────────────────────────────
-| A                        1 |
-| B                        2 |
-──────────────────────────────
-| letter-number mapping      |
-──────────────────────────────
+────────────────────────────────────────────────────────────
+| Cell Row              Left          Middle         Right |
+|──────────────────────────────────────────────────────────|
+| Cell Row: 0           Left          Middle         Right |
+| Cell Row: 1           Left          Middle         Right |
+| Cell Row: 2           Left          Middle         Right |
+| Cell Row: 3           Left          Middle         Right |
+────────────────────────────────────────────────────────────
 ```
 
 ## Future Plan
 
 Write a macro for a better experience when building the table.
+
+Support cross-cell text.
 
 ## License
 
