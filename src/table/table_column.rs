@@ -1,10 +1,7 @@
 use itertools::Itertools;
 
-use crate::table::Cell;
-
 use super::{CellOverflow, TableCell};
 
-#[derive(Debug, Clone)]
 pub struct TableColumn {
     cells: Vec<TableCell>,
     width: usize,
@@ -27,6 +24,12 @@ impl TableColumn {
     }
     pub fn set_width(&mut self, width: usize) {
         self.width = width;
+    }
+    pub fn get_width(&self) -> usize {
+        self.width
+    }
+    pub fn get_render_width(&self) -> usize {
+        self.width + 2
     }
 
     /// from row.
@@ -63,12 +66,16 @@ impl TableColumn {
 
 #[test]
 fn test_column_render() {
+    use itertools::Itertools;
+    use crate::table::{Cell, TableCell, TableColumn};
+    use colored::Colorize;
+    
     let cells: Vec<Vec<TableCell>> = (0..=3_u8)
         .into_iter()
         .map(|r| {
             (0..=5_u8)
                 .into_iter()
-                .map(|i| TableCell::new(Cell::TextCell(format!("Cell: {}@{}", r, i))))
+                .map(|i| TableCell::new(Cell::TextCell(format!("Cell: {}@{}", r, i))).with_formatter(vec![Colorize::green]))
                 .collect_vec()
         })
         .collect_vec();

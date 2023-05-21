@@ -1,9 +1,12 @@
-mod table_cell;
 mod overflow;
-mod table_column;
 mod table;
+mod table_cell;
+mod table_column;
 
-pub use table_cell::*;
+use colored::ColoredString;
 pub use overflow::*;
-pub use table_column::*;
 pub use table::*;
+pub use table_cell::*;
+pub use table_column::*;
+
+pub type FORMATTER = fn(ColoredString) -> ColoredString;

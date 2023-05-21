@@ -1,11 +1,13 @@
-use super::CellOverflow;
+use colored::Colorize;
 
-#[derive(Debug, Clone)]
+use super::{CellOverflow, FORMATTER};
+
 pub struct TableCell {
     cell: Cell,
     position: CellPosition,
     overflow: CellOverflow,
     width: Option<usize>,
+    formatter: Vec<FORMATTER>,
 }
 
 impl TableCell {
@@ -16,6 +18,7 @@ impl TableCell {
             position: CellPosition::Left,
             overflow: CellOverflow::Ellipsis,
             width,
+            formatter: vec![],
         }
     }
     pub fn with_position(mut self, position: CellPosition) -> Self {
@@ -42,9 +45,30 @@ impl TableCell {
     pub fn get_width(&self) -> Option<usize> {
         self.width
     }
+    pub fn with_formatter(mut self, mut formatter: Vec<FORMATTER>) -> Self {
+        self.formatter.append(&mut formatter);
+        self
+    }
+    pub fn set_formatter(&mut self, mut formatter: Vec<FORMATTER>) {
+        self.formatter.append(&mut formatter);
+    }
+
+    pub fn clone_text(&self) -> Self {
+        Self {
+            cell: self.cell.clone(),
+            overflow: self.overflow.clone(),
+            width: self.width.clone(),
+            formatter: vec![],
+            position: self.position.clone(),
+        }
+    }
 
     pub fn render(&self, width: usize) -> String {
         let (content, content_length) = self.cell.render_with_length(width, self.overflow);
+        let content = self
+            .formatter
+            .iter()
+            .fold(content.normal(), |acc, x| x(acc));
         if self.cell.is_splitter() {
             format!("─{}─", content)
         } else {
@@ -75,7 +99,9 @@ impl TableCell {
 
 #[test]
 fn test_render_tablecell() {
-    let cell = TableCell::new(Cell::TextCell("123123".into())).with_position(CellPosition::Middle);
+    let cell = TableCell::new(Cell::TextCell("123123".into()))
+        .with_position(CellPosition::Middle)
+        .with_formatter(vec![|v| Colorize::yellow(v), |v| Colorize::bold(v)]);
     let render_res = cell.render(5);
     println!("render result:\n----\n{}\n----", render_res);
     let cell = TableCell::new(Cell::Splitter);

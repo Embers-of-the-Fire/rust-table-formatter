@@ -10,10 +10,11 @@ homepage = "https://github.com/Embers-of-the-Fire/rust-table-formatter"
 repository = "https://github.com/Embers-of-the-Fire/rust-table-formatter.git"
 categories = ["command-line-interface", "value-formatting"]
 keywords = ["text", "table", "formatter"]
-include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE-MIT", "LICENSE-APACHE"]
+include = ["src/**/*", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE-MIT", "LICENSE-APACHE"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 thiserror = "1.0.38"
 itertools = "0.10.5"
+colored = "2.0.0"
