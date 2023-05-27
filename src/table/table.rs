@@ -3,26 +3,96 @@ use itertools::Itertools;
 
 use super::{Cell, CellOverflow, TableCell, TableColumn};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Border {
+    pub top: bool,
+    pub bottom: bool,
+    pub left: bool,
+    pub right: bool,
+}
+
+impl Border {
+    pub const ALL: Border = Border {
+        left: true,
+        right: true,
+        top: true,
+        bottom: true,
+    };
+    pub const NONE: Border = Border {
+        top: false,
+        bottom: false,
+        left: false,
+        right: false,
+    };
+    pub const LEFT: Border = Border {
+        left: true,
+        right: false,
+        top: false,
+        bottom: false,
+    };
+    pub const RIGHT: Border = Border {
+        left: false,
+        right: true,
+        top: false,
+        bottom: false,
+    };
+    pub const TOP: Border = Border {
+        left: false,
+        right: false,
+        top: true,
+        bottom: false,
+    };
+    pub const BOTTOM: Border = Border {
+        left: false,
+        right: false,
+        top: false,
+        bottom: true,
+    };
+
+    pub const fn mixin(mut self, other: &Self) -> Self {
+        if other.left {
+            self.left = true
+        }
+        if other.right {
+            self.right = true
+        }
+        if other.top {
+            self.top = true
+        }
+        if other.bottom {
+            self.bottom = true
+        }
+        self
+    }
+
+    pub const fn default() -> Self {
+        Self {
+            top: false,
+            bottom: false,
+            left: false,
+            right: false,
+        }
+    }
+}
+
 pub struct Table {
     columns: Vec<TableColumn>,
-    header: bool,
-    footer: bool,
+    border: Border,
 }
 
 impl Table {
     pub fn new(columns: Vec<TableColumn>) -> Table {
         Table {
             columns,
-            header: true,
-            footer: true,
+            border: Border::default(),
         }
     }
-    pub fn with_header(mut self, header: bool) -> Self {
-        self.header = header;
+    pub fn with_border(mut self, border: Border) -> Self {
+        self.border = border;
         self
     }
-    pub fn with_footer(mut self, footer: bool) -> Self {
-        self.footer = footer;
+    pub fn mixin_border(mut self, border: &Border) -> Self {
+        self.border = self.border.mixin(border);
         self
     }
     pub fn with_overflow(mut self, overflow: CellOverflow) -> Self {
@@ -82,21 +152,28 @@ impl Table {
         width += 2;
         let content = rows
             .into_iter()
-            .map(|row| format!("{}{}{}", "|".bold(), row.join(""), "|".bold()))
+            .map(|row| {
+                format!(
+                    "{}{}{}",
+                    if self.border.left { "|" } else { "" }.bold(),
+                    row.join(""),
+                    if self.border.left { "|" } else { "" }.bold()
+                )
+            })
             .join("\n");
         format!(
             "{}\n{}\n{}",
-            if self.header {
-                "─".repeat(width).bold()
+            if self.border.top {
+                "─".repeat(width)
             } else {
-                String::new().bold()
+                String::new()
             }
             .bold(),
             content,
-            if self.footer {
-                "─".repeat(width).bold()
+            if self.border.bottom {
+                "─".repeat(width)
             } else {
-                String::new().bold()
+                String::new()
             }
             .bold()
         )
@@ -125,23 +202,28 @@ impl Table {
         width += 2;
         let content = rows
             .into_iter()
-            .map(|row| format!("{}{}{}", "|", row.join(""), "|"))
+            .map(|row| {
+                format!(
+                    "{}{}{}",
+                    if self.border.left { "|" } else { "" },
+                    row.join(""),
+                    if self.border.left { "|" } else { "" }
+                )
+            })
             .join("\n");
         format!(
             "{}\n{}\n{}",
-            if self.header {
+            if self.border.top {
                 "─".repeat(width)
             } else {
                 String::new()
-            }
-            .bold(),
+            },
             content,
-            if self.footer {
+            if self.border.bottom {
                 "─".repeat(width)
             } else {
                 String::new()
             }
-            .bold()
         )
     }
 }
@@ -248,7 +330,8 @@ fn test_table_default_builder_raw() {
             ]
         })
         .collect_vec();
-    let table = Table::from_data(table_header, table_cells);
+    let table = Table::from_data(table_header, table_cells).with_border(Border::NONE);
     let render_res = table.render_raw();
+    println!("{:?}", render_res);
     println!("{}", render_res);
 }
