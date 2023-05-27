@@ -1,4 +1,5 @@
 use colored::Colorize;
+use itertools::Itertools;
 
 use super::{CellOverflow, FORMATTER};
 
@@ -26,6 +27,9 @@ impl TableCell {
             width,
             formatter: vec![],
         }
+    }
+    pub fn from_vec<T: Into<TableCell>>(v: Vec<T>) -> Vec<TableCell> {
+        v.into_iter().map(|i| i.into()).collect_vec()
     }
     pub fn with_position(mut self, position: CellPosition) -> Self {
         self.position = position;
@@ -75,6 +79,35 @@ impl TableCell {
             .formatter
             .iter()
             .fold(content.normal(), |acc, x| x(acc));
+        if self.cell.is_splitter() {
+            format!("─{}─", content)
+        } else {
+            match self.position {
+                CellPosition::Left => {
+                    format!(" {}{} ", content, " ".repeat(width - content_length))
+                }
+                CellPosition::Right => {
+                    format!(" {}{} ", " ".repeat(width - content_length), content)
+                }
+                CellPosition::Middle => {
+                    let diff = width - content_length;
+                    if content_length == width {
+                        format!(" {} ", content)
+                    } else if (diff & 1) == 1 {
+                        let left = (diff + 1) / 2;
+                        let right = diff - left;
+                        format!(" {}{}{} ", " ".repeat(left), content, " ".repeat(right))
+                    } else {
+                        let d = diff / 2;
+                        format!(" {}{}{} ", " ".repeat(d), content, " ".repeat(d))
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn render_raw(&self, width: usize) -> String {
+        let (content, content_length) = self.cell.render_with_length(width, self.overflow);
         if self.cell.is_splitter() {
             format!("─{}─", content)
         } else {

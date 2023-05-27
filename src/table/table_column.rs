@@ -62,20 +62,30 @@ impl TableColumn {
             .map(|cell| cell.render(self.width))
             .collect_vec()
     }
+
+    pub fn render_raw(&self) -> Vec<String> {
+        self.cells
+            .iter()
+            .map(|cell| cell.render_raw(self.width))
+            .collect_vec()
+    }
 }
 
 #[test]
 fn test_column_render() {
-    use itertools::Itertools;
     use crate::table::{Cell, TableCell, TableColumn};
     use colored::Colorize;
-    
+    use itertools::Itertools;
+
     let cells: Vec<Vec<TableCell>> = (0..=3_u8)
         .into_iter()
         .map(|r| {
             (0..=5_u8)
                 .into_iter()
-                .map(|i| TableCell::new(Cell::TextCell(format!("Cell: {}@{}", r, i))).with_formatter(vec![Colorize::green]))
+                .map(|i| {
+                    TableCell::new(Cell::TextCell(format!("Cell: {}@{}", r, i)))
+                        .with_formatter(vec![Colorize::green])
+                })
                 .collect_vec()
         })
         .collect_vec();
