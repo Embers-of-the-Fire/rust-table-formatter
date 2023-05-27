@@ -10,6 +10,12 @@ pub struct TableCell {
     formatter: Vec<FORMATTER>,
 }
 
+impl<T: Into<Cell>> From<T> for TableCell {
+    fn from(value: T) -> Self {
+        TableCell::new(value.into())
+    }
+}
+
 impl TableCell {
     pub fn new(cell: Cell) -> TableCell {
         let width = cell.get_width();
@@ -120,6 +126,16 @@ pub enum CellPosition {
 pub enum Cell {
     TextCell(String),
     Splitter,
+}
+
+impl<T: ToString> From<Option<T>> for Cell {
+    fn from(value: Option<T>) -> Self {
+        if let Some(v) = value {
+            Cell::TextCell(v.to_string())
+        } else {
+            Cell::Splitter
+        }
+    }
 }
 
 impl Cell {
