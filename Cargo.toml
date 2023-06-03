@@ -1,9 +1,9 @@
 [package]
 name = "table_formatter"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2021"
 authors = ["Embers-of-the-fire <wangbh533@126.com>"]
-description = "A simple text table formatter written"
+description = "A simple text table formatter written in Rust"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 homepage = "https://github.com/Embers-of-the-Fire/rust-table-formatter"
