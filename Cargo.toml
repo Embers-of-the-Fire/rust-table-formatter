@@ -15,6 +15,6 @@ include = ["src/**/*", "Cargo.toml", "Cargo.lock", "README.md", "LICENSE-MIT", "
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = "1.0.38"
+thiserror = "1.0.40"
 itertools = "0.10.5"
 colored = "2.0.0"
