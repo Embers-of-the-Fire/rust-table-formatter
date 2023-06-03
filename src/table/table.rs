@@ -138,14 +138,12 @@ impl Table {
         let mut rows: Vec<Vec<String>> = Vec::new();
         let mut width = 0_usize;
         for (s, size) in csr {
-            let mut pointer = 0_usize;
-            for ss in s {
-                if let Some(r) = rows.get_mut(pointer) {
+            for (index, ss) in s.into_iter().enumerate() {
+                if let Some(r) = rows.get_mut(index) {
                     r.push(ss);
                 } else {
                     rows.push(vec![ss])
                 }
-                pointer += 1;
             }
             width += size;
         }
@@ -188,18 +186,22 @@ impl Table {
         let mut rows: Vec<Vec<String>> = Vec::new();
         let mut width = 0_usize;
         for (s, size) in csr {
-            let mut pointer = 0_usize;
-            for ss in s {
-                if let Some(r) = rows.get_mut(pointer) {
+            for (index, ss) in s.into_iter().enumerate() {
+                if let Some(r) = rows.get_mut(index) {
                     r.push(ss);
                 } else {
                     rows.push(vec![ss])
                 }
-                pointer += 1;
             }
             width += size;
         }
-        width += 2;
+        if self.border.left {
+            width += 1;
+        }
+        if self.border.right {
+            width += 1;
+        }
+
         let content = rows
             .into_iter()
             .map(|row| {
@@ -207,7 +209,7 @@ impl Table {
                     "{}{}{}",
                     if self.border.left { "|" } else { "" },
                     row.join(""),
-                    if self.border.left { "|" } else { "" }
+                    if self.border.right { "|" } else { "" }
                 )
             })
             .join("\n");
@@ -250,7 +252,6 @@ fn test_table_render() {
     ];
     cells.append(
         &mut (0..=3_u8)
-            .into_iter()
             .map(|r| {
                 vec![
                     TableCell::new(Cell::TextCell(format!("Cell Row: {}", r)))
@@ -286,7 +287,6 @@ fn test_table_default_builder() {
     ];
 
     let table_cells: Vec<Vec<TableCell>> = (0..=3_u8)
-        .into_iter()
         .map(|r| {
             vec![
                 TableCell::new(Cell::TextCell(format!("Cell Row: {}", r)))
@@ -319,7 +319,6 @@ fn test_table_default_builder_raw() {
     ];
 
     let table_cells: Vec<Vec<TableCell>> = (0..=3_u8)
-        .into_iter()
         .map(|r| {
             vec![
                 TableCell::new(Cell::TextCell(format!("Cell Row: {}", r)))
@@ -332,6 +331,5 @@ fn test_table_default_builder_raw() {
         .collect_vec();
     let table = Table::from_data(table_header, table_cells).with_border(Border::NONE);
     let render_res = table.render_raw();
-    println!("{:?}", render_res);
     println!("{}", render_res);
 }

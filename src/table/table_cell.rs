@@ -1,12 +1,13 @@
 use colored::Colorize;
 use itertools::Itertools;
 
-use super::{CellOverflow, FORMATTER};
+use super::{CellOverflow, CellPadding, FORMATTER};
 
 pub struct TableCell {
     cell: Cell,
     position: CellPosition,
     overflow: CellOverflow,
+    padding: CellPadding,
     width: Option<usize>,
     formatter: Vec<FORMATTER>,
 }
@@ -26,10 +27,18 @@ impl TableCell {
             overflow: CellOverflow::Ellipsis,
             width,
             formatter: vec![],
+            padding: CellPadding::NONE,
         }
     }
     pub fn from_vec<T: Into<TableCell>>(v: Vec<T>) -> Vec<TableCell> {
         v.into_iter().map(|i| i.into()).collect_vec()
+    }
+    pub fn with_padding(mut self, padding: CellPadding) -> Self {
+        self.padding = padding;
+        self
+    }
+    pub fn set_padding(&mut self, padding: CellPadding) {
+        self.padding = padding;
     }
     pub fn with_position(mut self, position: CellPosition) -> Self {
         self.position = position;
@@ -63,74 +72,117 @@ impl TableCell {
         self.formatter.append(&mut formatter);
     }
 
-    pub fn clone_text(&self) -> Self {
+    pub fn clone_cell(&self) -> Self {
         Self {
             cell: self.cell.clone(),
-            overflow: self.overflow.clone(),
-            width: self.width.clone(),
+            overflow: self.overflow,
+            width: self.width,
             formatter: vec![],
-            position: self.position.clone(),
+            position: self.position,
+            padding: self.padding,
         }
     }
 
     pub fn render(&self, width: usize) -> String {
-        let (content, content_length) = self.cell.render_with_length(width, self.overflow);
-        let content = self
-            .formatter
-            .iter()
-            .fold(content.normal(), |acc, x| x(acc));
-        if self.cell.is_splitter() {
-            format!("─{}─", content)
+        if self.padding.left() + self.padding.right() >= width {
+            " ".repeat(width + 2)
         } else {
-            match self.position {
-                CellPosition::Left => {
-                    format!(" {}{} ", content, " ".repeat(width - content_length))
-                }
-                CellPosition::Right => {
-                    format!(" {}{} ", " ".repeat(width - content_length), content)
-                }
-                CellPosition::Middle => {
-                    let diff = width - content_length;
-                    if content_length == width {
-                        format!(" {} ", content)
-                    } else if (diff & 1) == 1 {
-                        let left = (diff + 1) / 2;
-                        let right = diff - left;
-                        format!(" {}{}{} ", " ".repeat(left), content, " ".repeat(right))
-                    } else {
-                        let d = diff / 2;
-                        format!(" {}{}{} ", " ".repeat(d), content, " ".repeat(d))
+            let cell_content_width = width - self.padding.left() - self.padding.right();
+            let (content, content_length) = self
+                .cell
+                .render_with_length(cell_content_width, self.overflow);
+            let content = self
+                .formatter
+                .iter()
+                .fold(content.normal(), |acc, x| x(acc));
+            if self.cell.is_splitter() {
+                format!("─{}─", content)
+            } else {
+                let content = match self.position {
+                    CellPosition::Left => {
+                        format!(
+                            "{}{}",
+                            content,
+                            " ".repeat(cell_content_width - content_length),
+                        )
                     }
-                }
+                    CellPosition::Right => {
+                        format!(
+                            "{}{}",
+                            " ".repeat(cell_content_width - content_length),
+                            content,
+                        )
+                    }
+                    CellPosition::Middle => {
+                        let diff = cell_content_width - content_length;
+                        if content_length == cell_content_width {
+                            format!("{}", content)
+                        } else if (diff & 1) == 1 {
+                            let left = (diff + 1) / 2;
+                            let right = diff - left;
+                            format!("{}{}{}", " ".repeat(left), content, " ".repeat(right))
+                        } else {
+                            let d = diff / 2;
+                            format!("{}{}{}", " ".repeat(d), content, " ".repeat(d))
+                        }
+                    }
+                };
+                format!(
+                    " {}{}{} ",
+                    " ".repeat(self.padding.left()),
+                    content,
+                    " ".repeat(self.padding.right())
+                )
             }
         }
     }
 
     pub fn render_raw(&self, width: usize) -> String {
-        let (content, content_length) = self.cell.render_with_length(width, self.overflow);
-        if self.cell.is_splitter() {
-            format!("─{}─", content)
+        if self.padding.left() + self.padding.right() >= width {
+            " ".repeat(width + 2)
         } else {
-            match self.position {
-                CellPosition::Left => {
-                    format!(" {}{} ", content, " ".repeat(width - content_length))
-                }
-                CellPosition::Right => {
-                    format!(" {}{} ", " ".repeat(width - content_length), content)
-                }
-                CellPosition::Middle => {
-                    let diff = width - content_length;
-                    if content_length == width {
-                        format!(" {} ", content)
-                    } else if (diff & 1) == 1 {
-                        let left = (diff + 1) / 2;
-                        let right = diff - left;
-                        format!(" {}{}{} ", " ".repeat(left), content, " ".repeat(right))
-                    } else {
-                        let d = diff / 2;
-                        format!(" {}{}{} ", " ".repeat(d), content, " ".repeat(d))
+            let cell_content_width = width - self.padding.left() - self.padding.right();
+            let (content, content_length) = self
+                .cell
+                .render_with_length(cell_content_width, self.overflow);
+            if self.cell.is_splitter() {
+                format!("─{}─", content)
+            } else {
+                let content = match self.position {
+                    CellPosition::Left => {
+                        format!(
+                            "{}{}",
+                            content,
+                            " ".repeat(cell_content_width - content_length),
+                        )
                     }
-                }
+                    CellPosition::Right => {
+                        format!(
+                            "{}{}",
+                            " ".repeat(cell_content_width - content_length),
+                            content,
+                        )
+                    }
+                    CellPosition::Middle => {
+                        let diff = cell_content_width - content_length;
+                        if content_length == cell_content_width {
+                            content
+                        } else if (diff & 1) == 1 {
+                            let left = (diff + 1) / 2;
+                            let right = diff - left;
+                            format!("{}{}{}", " ".repeat(left), content, " ".repeat(right))
+                        } else {
+                            let d = diff / 2;
+                            format!("{}{}{}", " ".repeat(d), content, " ".repeat(d))
+                        }
+                    }
+                };
+                format!(
+                    " {}{}{} ",
+                    " ".repeat(self.padding.left()),
+                    content,
+                    " ".repeat(self.padding.right())
+                )
             }
         }
     }
@@ -140,7 +192,17 @@ impl TableCell {
 fn test_render_tablecell() {
     let cell = TableCell::new(Cell::TextCell("123123".into()))
         .with_position(CellPosition::Middle)
-        .with_formatter(vec![|v| Colorize::yellow(v), |v| Colorize::bold(v)]);
+        .with_padding(CellPadding::new(0, 0));
+    let render_res = cell.render(5);
+    println!("render result:\n----\n{}\n----", render_res);
+    let cell = TableCell::new(Cell::TextCell("123123".into()))
+        .with_position(CellPosition::Middle)
+        .with_padding(CellPadding::new(1, 0));
+    let render_res = cell.render(5);
+    println!("render result:\n----\n{}\n----", render_res);
+    let cell = TableCell::new(Cell::TextCell("123123".into()))
+        .with_position(CellPosition::Middle)
+        .with_padding(CellPadding::new(1, 1));
     let render_res = cell.render(5);
     println!("render result:\n----\n{}\n----", render_res);
     let cell = TableCell::new(Cell::Splitter);
@@ -148,7 +210,7 @@ fn test_render_tablecell() {
     println!("render result:\n----\n{}\n----", render_res);
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum CellPosition {
     Left,
     Middle,
@@ -194,41 +256,73 @@ impl Cell {
         match self {
             Cell::Splitter => ("─".repeat(width), width),
             Cell::TextCell(text) => {
-                let mut string = String::new();
-                let mut now_index = 0;
-                let mut cache_string = String::new();
-                let mut flag = false;
-                let mut str_len: usize = 0;
-                for c in text.chars() {
-                    if now_index < width - 3 {
-                        string += c.to_string().as_str();
-                    } else if now_index < width {
-                        cache_string += c.to_string().as_str();
-                        if str_len == 0 {
-                            str_len = now_index;
+                if width <= 3 {
+                    let mut tc = text.chars();
+                    let mut string = String::new();
+                    for _ in 0..(width - 1) {
+                        if let Some(c) = tc.next() {
+                            string.push(c);
+                        } else {
+                            break;
                         }
-                    } else {
-                        flag = true;
-                        break;
                     }
-                    now_index += 1;
-                }
-                if now_index < width {
-                    str_len = now_index;
-                }
-                if !flag {
-                    (
-                        string + cache_string.as_str(),
-                        str_len + cache_string.chars().fold(0_usize, |acc, _| acc + 1),
-                    )
-                } else {
-                    (
-                        match overflow {
-                            CellOverflow::Hide => string + cache_string.as_str(),
-                            CellOverflow::Ellipsis => string + "...",
+                    match tc.next() {
+                        None => {
+                            let length = string.chars().count();
+                            (string, length)
+                        }
+                        Some(c) => match tc.next() {
+                            None => {
+                                string.push(c);
+                                (string, width)
+                            }
+                            Some(_) => match overflow {
+                                CellOverflow::Ellipsis => (string + ".", width),
+                                CellOverflow::Hide => {
+                                    string.push(c);
+                                    (string, width)
+                                }
+                            },
                         },
-                        width,
-                    )
+                    }
+                } else {
+                    let mut show_string = String::new();
+                    let mut tc = text.chars();
+                    let mut length = 0;
+                    for _ in 0..(width - 3) {
+                        if let Some(c) = tc.next() {
+                            show_string.push(c);
+                            length += 1;
+                        } else {
+                            break;
+                        }
+                    }
+                    match tc.next() {
+                        None => (show_string, length),
+                        Some(c) => {
+                            let mut res_string = String::new();
+                            res_string.push(c);
+                            let mut innl = 1;
+                            for _ in 0..2 {
+                                if let Some(ic) = tc.next() {
+                                    res_string.push(ic);
+                                    innl += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+                            if tc.next().is_some() {
+                                match overflow {
+                                    CellOverflow::Ellipsis => (show_string + "...", width),
+                                    CellOverflow::Hide => {
+                                        (show_string + res_string.as_str(), width)
+                                    }
+                                }
+                            } else {
+                                (show_string + res_string.as_str(), length + innl)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -237,7 +331,7 @@ impl Cell {
 
 #[test]
 fn test_render_cell() {
-    let cell = Cell::TextCell("135123234".into());
-    let render_res = cell.render_with_length(15, CellOverflow::Ellipsis);
+    let cell = Cell::TextCell("12123123343🍇".into());
+    let render_res = cell.render_with_length(7, CellOverflow::Hide);
     println!("{:#?}", render_res);
 }
