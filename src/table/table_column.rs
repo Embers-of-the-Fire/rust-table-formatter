@@ -36,14 +36,12 @@ impl TableColumn {
     pub fn from_cells(cells: Vec<Vec<TableCell>>) -> Vec<TableColumn> {
         let mut vec: Vec<Vec<TableCell>> = Vec::new();
         for cell_row in cells {
-            let mut pointer = 0_usize;
-            for cell in cell_row.into_iter() {
-                if let Some(vcol) = vec.get_mut(pointer) {
+            for (index, cell) in cell_row.into_iter().enumerate() {
+                if let Some(vcol) = vec.get_mut(index) {
                     vcol.push(cell)
                 } else {
                     vec.push(vec![cell])
                 }
-                pointer += 1;
             }
         }
         vec.into_iter()
@@ -78,10 +76,8 @@ fn test_column_render() {
     use itertools::Itertools;
 
     let cells: Vec<Vec<TableCell>> = (0..=3_u8)
-        .into_iter()
         .map(|r| {
             (0..=5_u8)
-                .into_iter()
                 .map(|i| {
                     TableCell::new(Cell::TextCell(format!("Cell: {}@{}", r, i)))
                         .with_formatter(vec![Colorize::green])
