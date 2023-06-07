@@ -1,15 +1,7 @@
-mod overflow;
-#[allow(clippy::module_inception)]
-mod table;
-mod table_cell;
-mod table_column;
-mod padding;
+mod content;
+mod settings;
+mod cell;
 
-use colored::ColoredString;
-pub use overflow::*;
-pub use table::*;
-pub use table_cell::*;
-pub use table_column::*;
-pub use padding::*;
-
-pub type FORMATTER = fn(ColoredString) -> ColoredString;
+pub use content::*;
+pub use settings::*;
+pub use cell::*;
