@@ -7,54 +7,72 @@ This lib is used to format plain-text table.
 Code:
 
 ```rust
-let table_header: Vec<TableCell> = vec![
-    TableCell::new(Cell::TextCell("Cell Row".into())).with_width(20),
-    TableCell::new(Cell::TextCell("Left".into()))
-        .with_position(CellPosition::Left)
-        .with_width(10),
-    TableCell::new(Cell::TextCell("Middle".into()))
-        .with_position(CellPosition::Middle)
-        .with_width(10),
-    TableCell::new(Cell::TextCell("Right".into()))
-        .with_position(CellPosition::Right)
-        .with_width(10),
+let table_header = vec![
+    cell!("Cell Row").with_width(Some(20)),
+    cell!("Left", align = Align::Left).with_width(Some(10)),
+    cell!("Center", align = Align::Center).with_width(Some(10)),
+    cell!("Right", align = Align::Right).with_width(Some(10)),
 ];
-let table_cells: Vec<Vec<TableCell>> = (0..=3_u8)
-    .into_iter()
-    .map(|r| {
-        vec![
-            TableCell::new(Cell::TextCell(format!("Cell Row: {}", r))),
-            TableCell::new(Cell::TextCell("Left".into())).with_position(CellPosition::Left),
-            TableCell::new(Cell::TextCell("Middle".into())).with_position(CellPosition::Middle),
-            TableCell::new(Cell::TextCell("Right".into())).with_position(CellPosition::Right),
-        ]
-    })
-    .collect_vec();
-let table = Table::from_data(table_header, table_cells);
-let render_res = table.render();
-println!("{}", render_res);
+let table_cells = {
+    let mut v = (0..=3_u8)
+        .map(|_| {
+            vec![
+                cell!("Cell Row"),
+                cell!("Left", align = Align::Left),
+                cell!("Center", align = Align::Center),
+                cell!("Right", align = Align::Right),
+            ]
+        })
+        .collect_vec();
+    v.push(cell!("Cross Cell!", align = Align::Center).with_span(3));
+    v
+};
+let table = table! {
+    table_header
+    ---
+    table_cells
+    with Border::ALL
+};
+let mut buffer = vec![];
+table.render(&mut buffer).unwrap();
+println!("{}", String::from_utf8(buffer).unwrap());
 ```
 
 Output:
 
 ```
 ────────────────────────────────────────────────────────────
-| Cell Row              Left          Middle         Right |
+| Cell Row              Left          Center         Right |
 |──────────────────────────────────────────────────────────|
-| Cell Row: 0           Left          Middle         Right |
-| Cell Row: 1           Left          Middle         Right |
-| Cell Row: 2           Left          Middle         Right |
-| Cell Row: 3           Left          Middle         Right |
+| Cell Row              Left          Center         Right |
+| Cell Row              Left          Center         Right |
+| Cell Row              Left          Center         Right |
+| Cell Row              Left          Center         Right |
+|                       Cross Cell!                        |
 ────────────────────────────────────────────────────────────
 ```
 
-> Actually the head part of the table is bold, but it cannot be rendered in markdown.
+> Actually the border of the table is bold, but it cannot be rendered in markdown.
 
 ## Future Plan
 
-Write a macro for a better experience when building the table.
+Waiting for report :)
 
-Support cross-cell text.
+## Change Log
+
+> I've forgot this, so change-log will start from v0.5.0
+
+### V0.5.0
+
+#### New features
+
+- Add render target: Markdown.
+- Add cross-cell support.
+- Add macro support.
+
+#### Warning
+
+This version is ***Completely Incompatible*** with previous versions.
 
 ## License
 
