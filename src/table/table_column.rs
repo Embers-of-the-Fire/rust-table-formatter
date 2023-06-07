@@ -54,14 +54,14 @@ impl TableColumn {
             .collect_vec()
     }
 
-    pub fn render(&self) -> Vec<String> {
+    pub(crate) fn render(&self) -> Vec<String> {
         self.cells
             .iter()
             .map(|cell| cell.render(self.width))
             .collect_vec()
     }
 
-    pub fn render_raw(&self) -> Vec<String> {
+    pub(crate) fn render_raw(&self) -> Vec<String> {
         self.cells
             .iter()
             .map(|cell| cell.render_raw(self.width))
