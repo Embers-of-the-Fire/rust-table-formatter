@@ -83,7 +83,7 @@ impl TableCell {
         }
     }
 
-    pub fn render(&self, width: usize) -> String {
+    pub(crate) fn render(&self, width: usize) -> String {
         if self.padding.left() + self.padding.right() >= width {
             " ".repeat(width + 2)
         } else {
@@ -137,7 +137,7 @@ impl TableCell {
         }
     }
 
-    pub fn render_raw(&self, width: usize) -> String {
+    pub(crate) fn render_raw(&self, width: usize) -> String {
         if self.padding.left() + self.padding.right() >= width {
             " ".repeat(width + 2)
         } else {
@@ -252,7 +252,7 @@ impl Cell {
         }
     }
 
-    fn render_with_length(&self, width: usize, overflow: CellOverflow) -> (String, usize) {
+    pub(crate) fn render_with_length(&self, width: usize, overflow: CellOverflow) -> (String, usize) {
         match self {
             Cell::Splitter => ("─".repeat(width), width),
             Cell::TextCell(text) => {
