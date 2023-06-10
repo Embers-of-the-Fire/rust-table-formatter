@@ -66,6 +66,7 @@ Waiting for report :)
 ### V0.5.1
 
 - Changed the api of formatter, and add a macro wrapper for them.
+- Added documentations.
 
 > If you are using the formatter, you just need to change your `vec!`s into `fmt!`s.
 
