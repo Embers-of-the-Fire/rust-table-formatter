@@ -8,6 +8,9 @@ use crate::table::{Align, Border, Cell, Content, Overflow, Renderer};
 
 use super::FormatterFunc;
 
+/// This is the main entry point of the lib, which represents the table to render.
+///
+/// For more information, please see the lib's documentation.
 #[derive(Clone)]
 pub struct Table {
     table: Vec<Vec<Cell>>,
@@ -15,11 +18,12 @@ pub struct Table {
 }
 
 impl Table {
-    pub fn create(
-        header: Vec<Cell>,
-        mut cell: Vec<Vec<Cell>>,
-        splitter: bool,
-    ) -> Table {
+    /// Create a new table with a header and some rows.
+    ///
+    /// When `splitter` is set to true, this will automatically add a splitter between header and contents.
+    ///
+    /// > This is the recommended way to create a new table, so for details see the lib's documentation.
+    pub fn create(header: Vec<Cell>, mut cell: Vec<Vec<Cell>>, splitter: bool) -> Table {
         let mut v = if splitter {
             let dat = header
                 .iter()
@@ -45,6 +49,7 @@ impl Table {
         }
     }
 
+    /// Create a new table with some rows.
     pub fn new(table: Vec<Vec<Cell>>) -> Table {
         Self {
             table,
@@ -60,6 +65,7 @@ impl Table {
         self.border = border;
     }
 
+    /// This function will overwrite the `overflow` property of every cells in the table.
     pub fn overwrite_overflow(&mut self, overflow: Overflow) {
         for row in self.table.iter_mut() {
             for cell in row.iter_mut() {
@@ -68,6 +74,11 @@ impl Table {
         }
     }
 
+    /// This will render the table according to the render settings. See the lib's documentation for more information.
+    ///
+    /// See [Renderer]
+    ///
+    /// [Renderer]: ../enum.Renderer.html
     pub fn rendered_by(
         &self,
         setting: Renderer,
@@ -80,6 +91,11 @@ impl Table {
         }
     }
 
+    /// This will render a markdown-formatted table.
+    ///
+    /// See also [rendered_by].
+    ///
+    /// [rendered_by]: #method.rendered_by
     pub fn render_markdown(&self, writer: &mut impl io::Write) -> Result<(), TableError> {
         self.validate()?;
         let mut rows = self.table.iter();
@@ -119,6 +135,11 @@ impl Table {
         Ok(())
     }
 
+    /// This will render a raw table without any formatting.
+    ///
+    /// See also [rendered_by].
+    ///
+    /// [rendered_by]: #method.rendered_by
     pub fn render_raw(&self, writer: &mut impl io::Write) -> Result<(), TableError> {
         let w = self.validate()?;
         let widths = self.update_width(w)?;
@@ -186,6 +207,11 @@ impl Table {
         Ok(())
     }
 
+    /// This will render a table with formatting you defined.
+    ///
+    /// See also [rendered_by].
+    ///
+    /// [rendered_by]: #method.rendered_by
     pub fn render(&self, writer: &mut impl io::Write) -> Result<(), TableError> {
         let w = self.validate()?;
         let widths = self.update_width(w)?;
@@ -253,7 +279,7 @@ impl Table {
         Ok(())
     }
 
-    pub fn update_width(&self, w: usize) -> Result<Vec<usize>, TableError> {
+    fn update_width(&self, w: usize) -> Result<Vec<usize>, TableError> {
         let mut v = std::iter::repeat(0).take(w).collect_vec();
         for row in self.table.iter() {
             for (index, cell) in row.iter().enumerate() {
@@ -273,6 +299,9 @@ impl Table {
         Ok(v)
     }
 
+    /// Check if the table is valid. The `usize` represents how many columns the table has.
+    ///
+    /// > This will be automatically checked when rendering, but you could also check it manually before it renders.
     pub fn validate(&self) -> Result<usize, TableError> {
         let mut t = self.table.iter();
         if let Some(v) = t.next() {

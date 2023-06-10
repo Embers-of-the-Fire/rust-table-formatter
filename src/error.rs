@@ -1,3 +1,5 @@
+//! Error definitions.
+
 use std::io;
 
 use thiserror::Error;

@@ -4,6 +4,14 @@ use crate::table::{Align, Content, Overflow, Padding};
 
 use super::FormatterFunc;
 
+/// Basic item for rendering a table.
+/// 
+/// ```rust
+/// # use table_formatter::table::Cell;
+/// # use table_formatter::table::Content;
+/// // This will create a cell with text "hello world".
+/// Cell::default().with_content(Content::new("hello world"));
+/// ```
 #[derive(Clone, Default)]
 pub struct Cell {
     content: Content,
@@ -77,6 +85,17 @@ impl Cell {
         self
     }
 
+    /// Automatically generate a cross-cell item.
+    /// 
+    /// Using `with_span(x)` will generate a vector with the cell *itself* and **x** empty cells.
+    /// 
+    /// ```rust
+    /// # use table_formatter::table::{Cell, Content};
+    /// let cells = Cell::default().with_content(Content::new("hello world")).with_span(3);
+    /// assert_eq!(cells[0].get_merge(), Some(3));
+    /// assert_eq!(cells.len(), 4);
+    /// assert!(matches!(cells[1].get_content(), Content::None))
+    /// ```
     pub fn with_span(mut self, span: usize) -> Vec<Self> {
         self.set_merge(Some(span));
         self.set_width(None);
