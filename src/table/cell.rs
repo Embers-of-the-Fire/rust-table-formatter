@@ -2,7 +2,9 @@ use colored::ColoredString;
 
 use crate::table::{Align, Content, Overflow, Padding};
 
-#[derive(Debug, Clone, Default)]
+use super::FormatterFunc;
+
+#[derive(Clone, Default)]
 pub struct Cell {
     content: Content,
     overflow: Overflow,
@@ -10,7 +12,7 @@ pub struct Cell {
     align: Align,
     padding: Padding,
     merge: Option<usize>,
-    formatter: Vec<fn(ColoredString) -> ColoredString>,
+    formatter: Vec<FormatterFunc>,
 }
 
 impl Cell {
@@ -39,7 +41,7 @@ impl Cell {
         self.merge = merge;
         self
     }
-    pub fn with_formatter(mut self, formatter: Vec<fn(ColoredString) -> ColoredString>) -> Self {
+    pub fn with_formatter(mut self, formatter: Vec<FormatterFunc>) -> Self {
         self.formatter = formatter;
         self
     }
@@ -63,17 +65,14 @@ impl Cell {
     pub fn set_merge(&mut self, merge: Option<usize>) {
         self.merge = merge;
     }
-    pub fn set_formatter(mut self, formatter: Vec<fn(ColoredString) -> ColoredString>) {
+    pub fn set_formatter(mut self, formatter: Vec<FormatterFunc>) {
         self.formatter = formatter;
     }
 
-    pub fn append_formatter(&mut self, formatter: &mut Vec<fn(ColoredString) -> ColoredString>) {
+    pub fn append_formatter(&mut self, formatter: &mut Vec<FormatterFunc>) {
         self.formatter.append(formatter);
     }
-    pub fn with_appended_formatter(
-        mut self,
-        formatter: &mut Vec<fn(ColoredString) -> ColoredString>,
-    ) -> Self {
+    pub fn with_appended_formatter(mut self, formatter: &mut Vec<FormatterFunc>) -> Self {
         self.formatter.append(formatter);
         self
     }
@@ -128,7 +127,9 @@ impl Cell {
         let result = self.render_with_width_raw(width);
         self.formatter
             .iter()
-            .fold(ColoredString::from(result.as_str()), |acc, func| func(acc))
+            .fold(ColoredString::from(result.as_str()), |acc, func| {
+                func.run(acc)
+            })
     }
 }
 

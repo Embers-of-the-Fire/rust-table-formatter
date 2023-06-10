@@ -1,24 +1,38 @@
 use std::io;
 
+use colored::Colorize;
 use itertools::Itertools;
 
 use crate::error::TableError;
 use crate::table::{Align, Border, Cell, Content, Overflow, Renderer};
 
-#[derive(Debug, Clone)]
+use super::FormatterFunc;
+
+#[derive(Clone)]
 pub struct Table {
     table: Vec<Vec<Cell>>,
     border: Border,
 }
 
 impl Table {
-    pub fn create(header: Vec<Cell>, mut cell: Vec<Vec<Cell>>, splitter: bool) -> Table {
+    pub fn create(
+        header: Vec<Cell>,
+        mut cell: Vec<Vec<Cell>>,
+        splitter: bool,
+    ) -> Table {
         let mut v = if splitter {
             let dat = header
                 .iter()
-                .map(|_| Cell::default().with_content(Content::Splitter))
+                .map(|_| {
+                    Cell::default()
+                        .with_content(Content::Splitter)
+                        .with_formatter(vec![FormatterFunc::Normal(Colorize::bold)])
+                })
                 .collect_vec();
-            let mut v = vec![header];
+            let mut v = vec![header
+                .into_iter()
+                .map(|c| c.with_formatter(vec![FormatterFunc::Normal(Colorize::bold)]))
+                .collect_vec()];
             v.push(dat);
             v
         } else {
@@ -173,7 +187,6 @@ impl Table {
     }
 
     pub fn render(&self, writer: &mut impl io::Write) -> Result<(), TableError> {
-        use colored::Colorize;
         let w = self.validate()?;
         let widths = self.update_width(w)?;
         let table_width = widths.iter().map(|v| v + 2).sum::<usize>()

@@ -27,15 +27,34 @@ macro_rules! cell {
     };
 }
 
+#[macro_export]
+macro_rules! fmt {
+    () => {
+        vec![]
+    };
+    ($func: expr) => {
+        vec![$crate::table::FormatterFunc::Boxed(std::rc::Rc::new(Box::new($func)))]
+    };
+    ($($func: expr),+ $(,)?) => {
+        vec![$($crate::table::FormatterFunc::Boxed(std::rc::Rc::new(Box::new($func))), )*]
+    }
+}
+
 #[test]
 fn test_table_macro() {
+    use colored::{Colorize, ColoredString};
+
     use crate::table::Align;
     use crate::table::Border;
 
+    let (r, g, b) = (100, 0, 0);
     let dat1 = vec![cell!("left"), cell!("right", align = Align::Right)];
     let dat2 = vec![
         vec![cell!(-), cell!()],
-        vec![cell!("1"), cell!("2", align = Align::Right)],
+        vec![
+            cell!("1"),
+            cell!("2", align = Align::Right).with_formatter(fmt!(move |s: ColoredString| s.truecolor(r, g, b), Colorize::blue)),
+        ],
     ];
     let table = table! {dat1 - dat2 with Border::ALL};
 

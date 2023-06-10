@@ -7,6 +7,9 @@ This lib is used to format plain-text table.
 Code:
 
 ```rust
+use itertools::Itertools;
+use table_formatter::{cell, table};
+use table_formatter::table::{Align, Border};
 let table_header = vec![
     cell!("Cell Row").with_width(Some(20)),
     cell!("Left", align = Align::Left).with_width(Some(10)),
@@ -60,7 +63,11 @@ Waiting for report :)
 
 ## Change Log
 
-> I've forgot this, so change-log will start from v0.5.0
+### V0.5.1
+
+- Changed the api of formatter, and add a macro wrapper for them.
+
+> If you are using the formatter, you just need to change your `vec!`s into `fmt!`s.
 
 ### V0.5.0
 
