@@ -2,7 +2,17 @@ use colored::ColoredString;
 
 use crate::table::{Align, Content, Overflow, Padding};
 
-#[derive(Debug, Clone, Default)]
+use super::FormatterFunc;
+
+/// Basic item for rendering a table.
+/// 
+/// ```rust
+/// # use table_formatter::table::Cell;
+/// # use table_formatter::table::Content;
+/// // This will create a cell with text "hello world".
+/// Cell::default().with_content(Content::new("hello world"));
+/// ```
+#[derive(Clone, Default)]
 pub struct Cell {
     content: Content,
     overflow: Overflow,
@@ -10,7 +20,7 @@ pub struct Cell {
     align: Align,
     padding: Padding,
     merge: Option<usize>,
-    formatter: Vec<fn(ColoredString) -> ColoredString>,
+    formatter: Vec<FormatterFunc>,
 }
 
 impl Cell {
@@ -39,7 +49,7 @@ impl Cell {
         self.merge = merge;
         self
     }
-    pub fn with_formatter(mut self, formatter: Vec<fn(ColoredString) -> ColoredString>) -> Self {
+    pub fn with_formatter(mut self, formatter: Vec<FormatterFunc>) -> Self {
         self.formatter = formatter;
         self
     }
@@ -63,21 +73,29 @@ impl Cell {
     pub fn set_merge(&mut self, merge: Option<usize>) {
         self.merge = merge;
     }
-    pub fn set_formatter(mut self, formatter: Vec<fn(ColoredString) -> ColoredString>) {
+    pub fn set_formatter(mut self, formatter: Vec<FormatterFunc>) {
         self.formatter = formatter;
     }
 
-    pub fn append_formatter(&mut self, formatter: &mut Vec<fn(ColoredString) -> ColoredString>) {
+    pub fn append_formatter(&mut self, formatter: &mut Vec<FormatterFunc>) {
         self.formatter.append(formatter);
     }
-    pub fn with_appended_formatter(
-        mut self,
-        formatter: &mut Vec<fn(ColoredString) -> ColoredString>,
-    ) -> Self {
+    pub fn with_appended_formatter(mut self, formatter: &mut Vec<FormatterFunc>) -> Self {
         self.formatter.append(formatter);
         self
     }
 
+    /// Automatically generate a cross-cell item.
+    /// 
+    /// Using `with_span(x)` will generate a vector with the cell *itself* and **x** empty cells.
+    /// 
+    /// ```rust
+    /// # use table_formatter::table::{Cell, Content};
+    /// let cells = Cell::default().with_content(Content::new("hello world")).with_span(3);
+    /// assert_eq!(cells[0].get_merge(), Some(3));
+    /// assert_eq!(cells.len(), 4);
+    /// assert!(matches!(cells[1].get_content(), Content::None))
+    /// ```
     pub fn with_span(mut self, span: usize) -> Vec<Self> {
         self.set_merge(Some(span));
         self.set_width(None);
@@ -128,7 +146,9 @@ impl Cell {
         let result = self.render_with_width_raw(width);
         self.formatter
             .iter()
-            .fold(ColoredString::from(result.as_str()), |acc, func| func(acc))
+            .fold(ColoredString::from(result.as_str()), |acc, func| {
+                func.run(acc)
+            })
     }
 }
 

@@ -1,3 +1,8 @@
+/// Overflow setting for cells.
+/// 
+/// `Overflow::Ellipsis`: "hello world" -> "he..."
+///
+/// `Overflow::Hidden`: "hello" -> "hello"
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Overflow {
     Ellipsis,
@@ -10,6 +15,7 @@ impl Default for Overflow {
     }
 }
 
+/// Text alignment.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Align {
     Left,
@@ -23,6 +29,9 @@ impl Default for Align {
     }
 }
 
+/// Padding around the content.
+/// 
+/// A string `"hello"` with `Padding{ left: 1, right: 1 }` will become `" ell "` but not `" hello "`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Padding {
     pub left: usize,
@@ -36,6 +45,7 @@ impl Padding {
     }
 }
 
+/// Border of the table.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Border {
     pub left: bool,
@@ -59,9 +69,13 @@ impl Border {
     }
 }
 
+/// Render settings.
 #[derive(Debug, Clone, Copy)]
 pub enum Renderer {
+    /// Render a normal table, with ansi color settings.
     Normal,
+    /// Render a raw table, containing only contents.
     Raw,
+    /// Render a markdown-formatted table. The alignment is determined by **the first row**, and the alignment of the rest of the table will be *ignored*.
     Markdown,
 }

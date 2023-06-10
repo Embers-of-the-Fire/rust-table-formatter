@@ -1,5 +1,17 @@
 use super::Overflow;
 
+/// Any possible content in a cell.
+/// 
+/// - Text(String): pure text.
+/// - Splitter: horizontal splitter. Looks like "─".
+/// - None: empty content.
+/// 
+/// ```rust
+/// # use table_formatter::table::Content;
+/// // You can use a string to create one.
+/// assert_eq!(<&str as Into<Content>>::into("123").get_content(), Content::Text("123".to_string()).get_content());
+/// assert_eq!(Content::new("123").get_content(), Content::Text("123".to_string()).get_content());
+/// ```
 #[derive(Debug, Clone, Default)]
 pub enum Content {
     Text(String),
@@ -79,6 +91,13 @@ impl Content {
             },
             Self::Splitter => ("─".repeat(width), width),
             Self::None => (" ".repeat(width), width),
+        }
+    }
+
+    pub fn get_content(&self) -> Option<&String> {
+        match self {
+            Self::Text(ref t) => Some(t),
+            _ => None
         }
     }
 }
