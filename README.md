@@ -63,12 +63,16 @@ Waiting for report :)
 
 ## Change Log
 
-### V0.5.1
+### V0.6.0
 
 - Changed the api of formatter, and add a macro wrapper for them.
 - Added documentations.
 
 > If you are using the formatter, you just need to change your `vec!`s into `fmt!`s.
+
+### V0.5.1
+
+This version is yanked.
 
 ### V0.5.0
 
