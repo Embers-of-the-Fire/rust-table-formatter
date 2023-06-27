@@ -105,3 +105,25 @@ fn test_table_formatter_markdown() {
         println!("{}", String::from_utf8(r).unwrap())
     }
 }
+
+#[test]
+fn test_default() {
+    use table_formatter::table::*;
+    use table_formatter::{cell, table};
+    let table_header = vec![
+        vec![
+            Cell::default().with_content(Content::new("123")),
+            Cell::default().with_content(Content::new(444)),
+        ],
+        vec![
+            Cell::default().with_content(Content::None),
+            Cell::default().with_content(Content::new("777")),
+        ],
+    ];
+    let table = table! {
+        table_header
+    };
+    let mut buffer = vec![];
+    table.render(&mut buffer).unwrap();
+    println!("{}", String::from_utf8(buffer).unwrap());
+}
