@@ -73,13 +73,13 @@
 //! 
 //! Output:
 //! ```markdown
-//! |Cell Row|Right|
-//! |:--|--:|
-//! |───|───|
-//! |Cell Row|Right|
-//! |Cell Row|Right|
-//! |Cell Row|Right|
-//! |Cell Row|Right|
+//! ┃Cell Row┃Right┃
+//! ┃:--┃--:┃
+//! ┃━━━┃━━━┃
+//! ┃Cell Row┃Right┃
+//! ┃Cell Row┃Right┃
+//! ┃Cell Row┃Right┃
+//! ┃Cell Row┃Right┃
 //! ```
 //!
 //! [table::Renderer]: ../table/enum.Renderer.html

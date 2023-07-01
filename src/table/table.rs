@@ -107,30 +107,30 @@ impl Table {
                     Align::Center => ":-:",
                     Align::Right => "--:",
                 })
-                .join("|");
+                .join("┃");
             let hr = h
                 .iter()
                 .map(|c| match c.get_content() {
                     Content::None => "".to_string(),
-                    Content::Splitter => "───".to_string(),
+                    Content::Splitter => "━━━".to_string(),
                     Content::Text(ref text) => text.clone(),
                 })
-                .join("|");
-            writeln!(writer, "|{}|", hr)?;
-            writeln!(writer, "|{}|", setting_row)?;
+                .join("┃");
+            writeln!(writer, "┃{}┃", hr)?;
+            writeln!(writer, "┃{}┃", setting_row)?;
             for row in rows {
                 let hr = row
                     .iter()
                     .map(|c| match c.get_content() {
                         Content::None => "".to_string(),
-                        Content::Splitter => "───".to_string(),
+                        Content::Splitter => "━━━".to_string(),
                         Content::Text(ref text) => text.clone(),
                     })
-                    .join("|");
-                writeln!(writer, "|{}|", hr)?;
+                    .join("┃");
+                writeln!(writer, "┃{}┃", hr)?;
             }
         } else {
-            writeln!(writer, "||\n|-|")?;
+            writeln!(writer, "┃┃\n┃-┃")?;
         }
         Ok(())
     }
@@ -147,11 +147,11 @@ impl Table {
             + if self.border.left { 1 } else { 0 }
             + if self.border.right { 1 } else { 0 };
         if self.border.top {
-            writeln!(writer, "{}", "─".repeat(table_width))?;
+            writeln!(writer, "{}", "━".repeat(table_width))?;
         }
         for (y, row) in self.table.iter().enumerate() {
             if self.border.left {
-                write!(writer, "|")?;
+                write!(writer, "┃")?;
             }
             let mut pass: Vec<usize> = vec![];
             'cell: for (x, cell) in row.iter().enumerate() {
@@ -197,12 +197,12 @@ impl Table {
                 }
             }
             if self.border.right {
-                write!(writer, "|")?;
+                write!(writer, "┃")?;
             }
             writeln!(writer)?;
         }
         if self.border.bottom {
-            writeln!(writer, "{}", "─".repeat(table_width))?;
+            writeln!(writer, "{}", "━".repeat(table_width))?;
         }
         Ok(())
     }
@@ -219,11 +219,11 @@ impl Table {
             + if self.border.left { 1 } else { 0 }
             + if self.border.right { 1 } else { 0 };
         if self.border.top {
-            writeln!(writer, "{}", "─".repeat(table_width).bold())?;
+            writeln!(writer, "{}", "━".repeat(table_width).bold())?;
         }
         for (y, row) in self.table.iter().enumerate() {
             if self.border.left {
-                write!(writer, "{}", "|".bold())?;
+                write!(writer, "{}", "┃".bold())?;
             }
             let mut pass: Vec<usize> = vec![];
             'cell: for (x, cell) in row.iter().enumerate() {
@@ -269,12 +269,12 @@ impl Table {
                 }
             }
             if self.border.right {
-                write!(writer, "{}", "|".bold())?;
+                write!(writer, "{}", "┃".bold())?;
             }
             writeln!(writer)?;
         }
         if self.border.bottom {
-            writeln!(writer, "{}", "─".repeat(table_width).bold())?;
+            writeln!(writer, "{}", "━".repeat(table_width).bold())?;
         }
         Ok(())
     }

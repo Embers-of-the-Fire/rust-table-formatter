@@ -3,7 +3,7 @@ use super::Overflow;
 /// Any possible content in a cell.
 /// 
 /// - Text(String): pure text.
-/// - Splitter: horizontal splitter. Looks like "─".
+/// - Splitter: horizontal splitter. Looks like "━".
 /// - None: empty content.
 /// 
 /// ```rust
@@ -89,7 +89,7 @@ impl Content {
                     (s, w)
                 }
             },
-            Self::Splitter => ("─".repeat(width), width),
+            Self::Splitter => ("━".repeat(width), width),
             Self::None => (" ".repeat(width), width),
         }
     }
@@ -132,7 +132,7 @@ fn test_render_cell() {
 
     let cell = Content::Splitter;
     let (t, w) = cell.render_with_width(9, Overflow::Hidden);
-    assert_eq!("─────────", t.as_str());
+    assert_eq!("━━━━━━━━━", t.as_str());
     assert_eq!(9, w);
 
     let cell = Content::None;

@@ -109,7 +109,7 @@ fn test_table_formatter_markdown() {
 #[test]
 fn test_default() {
     use table_formatter::table::*;
-    use table_formatter::{cell, table};
+    use table_formatter::table;
     let table_header = vec![
         vec![
             Cell::default().with_content(Content::new("123")),
