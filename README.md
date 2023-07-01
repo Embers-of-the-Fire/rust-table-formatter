@@ -1,4 +1,26 @@
-# Tabel Formatter
+# Table Formatter
+
+<p id="badge" align="center">
+	<a href="https://github.com/Embers-of-the-Fire/rust-table-formatter"><img src="https://img.shields.io/badge/Repo-rust--table--formatter-FDC75B" alt="Repo" /></a>
+    &nbsp;
+    <a href="https://crates.io/crates/table_formatter"><img src="https://img.shields.io/crates/v/table_formatter
+" alt="Crates-io Version" /></a>
+    &nbsp;
+    <img src="https://img.shields.io/github/languages/top/Embers-of-the-Fire/rust-table-formatter
+" alt="Language Count" />
+    &nbsp;
+    <img src="https://img.shields.io/badge/License-Apache2.0%20%2F%20MIT-89B701
+" alt="License" />
+    <br />
+    <a href="https://github.com/Embers-of-the-Fire/rust-table-formatter/actions"><img src="https://img.shields.io/github/actions/workflow/status/Embers-of-the-Fire/rust-table-formatter/mean_bean_ci.yml
+" alt="Build Status" /></a>
+    &nbsp;
+    <a href="https://github.com/Embers-of-the-Fire/rust-table-formatter"><img src="https://img.shields.io/github/commit-activity/m/Embers-of-the-Fire/rust-table-formatter
+" alt="Commit Activity" /></a>
+    &nbsp;
+    <a href="https://crates.io/crates/table_formatter"><img src="https://img.shields.io/crates/dr/table_formatter?logo=rust&color=FDC75B
+" alt="Recent Downloads" /></a>
+</p>
 
 This lib is used to format plain-text table.
 
@@ -44,15 +66,15 @@ println!("{}", String::from_utf8(buffer).unwrap());
 Output:
 
 ```
-────────────────────────────────────────────────────────────
-| Cell Row              Left          Center         Right |
-|──────────────────────────────────────────────────────────|
-| Cell Row              Left          Center         Right |
-| Cell Row              Left          Center         Right |
-| Cell Row              Left          Center         Right |
-| Cell Row              Left          Center         Right |
-|                       Cross Cell!                        |
-────────────────────────────────────────────────────────────
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃ Cell Row              Left          Center         Right ┃
+┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┃
+┃ Cell Row              Left          Center         Right ┃
+┃ Cell Row              Left          Center         Right ┃
+┃ Cell Row              Left          Center         Right ┃
+┃ Cell Row              Left          Center         Right ┃
+┃                       Cross Cell!                        ┃
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 > Actually the border of the table is bold, but it cannot be rendered in markdown.
@@ -65,8 +87,8 @@ Waiting for report :)
 
 ### V0.6.0
 
-- Changed the api of formatter, and add a macro wrapper for them.
-- Added documentations.
+-   Changed the api of formatter, and add a macro wrapper for them.
+-   Added documentations.
 
 > If you are using the formatter, you just need to change your `vec!`s into `fmt!`s.
 
@@ -78,13 +100,13 @@ This version is yanked.
 
 #### New features
 
-- Add render target: Markdown.
-- Add cross-cell support.
-- Add macro support.
+-   Add render target: Markdown.
+-   Add cross-cell support.
+-   Add macro support.
 
 #### Warning
 
-This version is ***Completely Incompatible*** with previous versions.
+This version is **_Completely Incompatible_** with previous versions.
 
 ## License
 
